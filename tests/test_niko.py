@@ -58,6 +58,10 @@ class MockNikoController(object):
                                 ]
                                 conn.sendall(json.dumps(result).encode()
                                              + b"\r\n")
+                            elif parsed['cmd'] == 'executeactions':
+                                result['data'] = {"error": 0}
+                                conn.sendall(json.dumps(result).encode()
+                                             + b"\r\n")
                             else:
                                 conn.sendall(data.encode()+b"\r\n")
                     except ConnectionResetError:
@@ -149,4 +153,17 @@ async def test_get_actions(controller, niko):
     assert actions[0]['id'] == 1
     assert actions[0]['name'] == 'Action 1'
     assert len(controller.calls) == 1
+    pass
+
+
+@pytest.mark.asyncio
+async def test_execute_action(controller, niko):
+    result = await niko.execute_action(action_id=1, value=100)
+    assert result is not None
+    assert result == {"error": 0}
+    assert len(controller.calls) == 1
+    result = await niko.execute_action(action_id=1, value=0)
+    assert result is not None
+    assert result == {"error": 0}
+    assert len(controller.calls) == 2
     pass

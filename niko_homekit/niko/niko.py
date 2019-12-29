@@ -119,3 +119,13 @@ class Niko(object):
             self._actions = await self.do({'cmd': 'listactions'})
         await self._actions
         return self._actions.result()
+
+    async def execute_action(self, action_id=None, value=None):
+        assert id is not None
+        assert value is not None
+        result = await self.do({'cmd': 'executeactions',
+                                'id': action_id,
+                                'value1': value})
+        await result
+        return result.result()
+        pass
