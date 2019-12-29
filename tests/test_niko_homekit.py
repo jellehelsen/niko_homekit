@@ -42,7 +42,6 @@ def test_command_line_interface():
 @patch("niko_homekit.niko_homekit.socket", spec=socket)
 def test_find_niko(sock):
     """Test if Niko is found"""
-    print(sock)
     instance = sock.return_value
     return_data = b"D\0\0FFF" + \
         inet_aton("192.168.0.120") + \
