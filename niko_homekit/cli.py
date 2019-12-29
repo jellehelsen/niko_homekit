@@ -1,5 +1,5 @@
 """Console script for niko_homekit."""
-import sys
+# import sys
 import click
 
 
