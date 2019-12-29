@@ -69,6 +69,8 @@ class Niko(object):
         self.port = port
         self.transport = None
         self.connection_thread = None
+        self._actions = None
+        self._locations = None
         executor_opts = {'max_workers': None}
 
         if sys.version_info >= (3, 6):
@@ -107,6 +109,13 @@ class Niko(object):
         return await self.protocol.run_cmd(cmd)
 
     async def get_locations(self):
-        locations = await self.do({'cmd': 'listlocations'})
-        await locations
-        return locations.result()
+        if not self._locations:
+            self._locations = await self.do({'cmd': 'listlocations'})
+        await self._locations
+        return self._locations.result()
+
+    async def get_actions(self):
+        if not self._actions:
+            self._actions = await self.do({'cmd': 'listactions'})
+        await self._actions
+        return self._actions.result()

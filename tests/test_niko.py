@@ -49,7 +49,13 @@ class MockNikoController(object):
                                     {'id': 1, 'name': "location1"},
                                     {'id': 2, 'name': 'location2'}
                                 ]
-                                print(result)
+                                conn.sendall(json.dumps(result).encode()
+                                             + b"\r\n")
+                            elif parsed['cmd'] == 'listactions':
+                                result['data'] = [
+                                    {'id': 1, 'name': "Action 1"},
+                                    {'id': 2, 'name': 'Action 2'}
+                                ]
                                 conn.sendall(json.dumps(result).encode()
                                              + b"\r\n")
                             else:
@@ -118,5 +124,29 @@ async def test_get_locations(controller, niko):
     locations = await niko.get_locations()
     assert len(locations) > 0
     assert locations[0]['id'] == 1
+    assert locations[0]['name'] == 'location1'
     assert '{"cmd": "listlocations"}' in controller.calls
+    assert len(controller.calls) == 1
+    # check if caching works
+    assert len(locations) > 0
+    assert locations[0]['id'] == 1
+    assert locations[0]['name'] == 'location1'
+    assert '{"cmd": "listlocations"}' in controller.calls
+    assert len(controller.calls) == 1
+    pass
+
+
+@pytest.mark.asyncio
+async def test_get_actions(controller, niko):
+    actions = await niko.get_actions()
+    assert len(actions) > 0
+    assert actions[0]['id'] == 1
+    assert actions[0]['name'] == 'Action 1'
+    assert len(controller.calls) == 1
+    # check if caching works
+    actions = await niko.get_actions()
+    assert len(actions) > 0
+    assert actions[0]['id'] == 1
+    assert actions[0]['name'] == 'Action 1'
+    assert len(controller.calls) == 1
     pass
