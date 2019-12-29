@@ -5,6 +5,8 @@
 import pytest
 
 from click.testing import CliRunner
+from unittest.mock import patch
+from socket import socket, inet_aton
 
 from niko_homekit import niko_homekit
 from niko_homekit import cli
@@ -37,6 +39,14 @@ def test_command_line_interface():
     assert '--help  Show this message and exit.' in help_result.output
 
 
-def test_find_niko():
-    result = cli.find_niko()
-    assert result == "192.168.0.141"
+@patch("niko_homekit.niko_homekit.socket", spec=socket)
+def test_find_niko(sock):
+    """Test if Niko is found"""
+    print(sock)
+    instance = sock.return_value
+    return_data = b"D\0\0FFF" + \
+        inet_aton("192.168.0.120") + \
+        inet_aton("255.255.255.0")
+    instance.recvfrom.return_value = (return_data, b"192.168.0.120")
+    result = niko_homekit.find_niko()
+    assert result == "192.168.0.120"
