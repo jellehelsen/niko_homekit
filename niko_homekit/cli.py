@@ -1,8 +1,14 @@
 """Console script for niko_homekit."""
-# import sys
+import os
 import click
 from socket import socket, AF_INET, SOCK_DGRAM, \
     SOL_SOCKET, SO_BROADCAST, inet_ntoa
+import logging
+import logging.config
+
+
+logging.config.fileConfig("logging.conf", os.environ)
+logger = logging.getLogger(__name__)
 
 
 def find_niko():
@@ -19,7 +25,9 @@ def find_niko():
 @click.command()
 def main(args=None):
     """Console script for niko_homekit."""
-    # niko = find_niko()
+    logging.debug("Searching for the Niko Home Controller...")
+    niko = find_niko()
+    logging.debug(f"Controller found at {niko}")
     # start_niko(niko)
     # start_homekit()
     click.echo("Hello World!")
