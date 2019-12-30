@@ -4,8 +4,9 @@ import pytest
 import json
 from socket import socket
 from threading import Thread
+import asyncio
 
-from niko_homekit.niko.niko import Niko
+from niko_homekit.niko.niko import Niko, Action
 
 
 class MockNikoController(object):
@@ -144,14 +145,14 @@ async def test_get_locations(controller, niko):
 async def test_get_actions(controller, niko):
     actions = await niko.get_actions()
     assert len(actions) > 0
-    assert actions[0]['id'] == 1
-    assert actions[0]['name'] == 'Action 1'
+    assert actions[0].device_id == 1
+    assert actions[0].name == 'Action 1'
     assert len(controller.calls) == 1
     # check if caching works
     actions = await niko.get_actions()
     assert len(actions) > 0
-    assert actions[0]['id'] == 1
-    assert actions[0]['name'] == 'Action 1'
+    assert actions[0].device_id == 1
+    assert actions[0].name == 'Action 1'
     assert len(controller.calls) == 1
     pass
 
@@ -167,3 +168,18 @@ async def test_execute_action(controller, niko):
     assert result == {"error": 0}
     assert len(controller.calls) == 2
     pass
+
+
+# @pytest.mark.asyncio
+# async def test_real_action():
+#     niko = Niko('192.168.0.141')
+#     await niko.connect()
+#     result = await niko.execute_action(action_id=1, value=100)
+#     assert result is not None
+#     assert result == {"error": 0}
+#     await asyncio.sleep(1)
+
+#     result = await niko.execute_action(action_id=1, value=0)
+#     assert result is not None
+#     assert result == {"error": 0}
+#     pass

@@ -1,21 +1,21 @@
 """Console script for niko_homekit."""
 import os
-import click
 import logging
 import logging.config
+import click
 
 from niko_homekit import niko_homekit
 
 logging.config.fileConfig("logging.conf", os.environ)
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @click.command()
-def main(args=None):
+def main():
     """Console script for niko_homekit."""
-    logger.debug("Searching for the Niko Home Controller...")
+    LOGGER.debug("Searching for the Niko Home Controller...")
     niko = niko_homekit.find_niko()
-    logger.debug(f"Controller found at {niko}")
+    LOGGER.debug("Controller found at %x", niko)
     # start_niko(niko)
     # start_homekit()
     click.echo("Hello World!")
