@@ -33,19 +33,17 @@ def test_command_line_interface():
     runner = CliRunner()
     result = runner.invoke(cli.main)
     assert result.exit_code == 0
-    assert 'Hello World!' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+    assert "Hello World!" in result.output
+    help_result = runner.invoke(cli.main, ["--help"])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    assert "--help  Show this message and exit." in help_result.output
 
 
 @patch("niko_homekit.niko_homekit.socket", spec=socket)
 def test_find_niko(sock):
     """Test if Niko is found"""
     instance = sock.return_value
-    return_data = b"D\0\0FFF" + \
-        inet_aton("192.168.0.120") + \
-        inet_aton("255.255.255.0")
+    return_data = b"D\0\0FFF" + inet_aton("192.168.0.120") + inet_aton("255.255.255.0")
     instance.recvfrom.return_value = (return_data, b"192.168.0.120")
     result = niko_homekit.find_niko()
     assert result == "192.168.0.120"

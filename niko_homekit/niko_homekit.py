@@ -1,7 +1,13 @@
 """Main module."""
 import logging
-from socket import socket, AF_INET, SOCK_DGRAM, \
-    SOL_SOCKET, SO_BROADCAST, inet_ntoa
+from socket import (
+    socket,
+    AF_INET,
+    SOCK_DGRAM,
+    SOL_SOCKET,
+    SO_BROADCAST,
+    inet_ntoa,
+)
 
 
 LOGGER = logging.getLogger(__name__)

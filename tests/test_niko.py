@@ -4,19 +4,18 @@ import pytest
 import json
 from socket import socket
 from threading import Thread
-import asyncio
-
-from niko_homekit.niko.niko import Niko, Action
+from niko_homekit.niko.niko import Niko
 
 
 class MockNikoController(object):
     """Mocks a Niko Home Control controller
 
     """
+
     def __init__(self):
         super(MockNikoController, self).__init__()
         self.sock = socket()
-        self.sock.bind(('127.0.0.1', 0))
+        self.sock.bind(("127.0.0.1", 0))
         self.sock.listen(1)
         self.sock.settimeout(1)
         self._stop = False
@@ -42,39 +41,36 @@ class MockNikoController(object):
                         print(data)
                         parsed = json.loads(data)
                         print(parsed)
-                        if 'cmd' in parsed:
-                            result = {'cmd': parsed['cmd']}
+                        if "cmd" in parsed:
+                            result = {"cmd": parsed["cmd"]}
                             print(result)
-                            if parsed['cmd'] == 'listlocations':
-                                result['data'] = [
-                                    {'id': 1, 'name': "location1"},
-                                    {'id': 2, 'name': 'location2'}
+                            if parsed["cmd"] == "listlocations":
+                                result["data"] = [
+                                    {"id": 1, "name": "location1"},
+                                    {"id": 2, "name": "location2"},
                                 ]
-                                conn.sendall(json.dumps(result).encode()
-                                             + b"\r\n")
-                            elif parsed['cmd'] == 'listactions':
-                                result['data'] = [
-                                    {'id': 1, 'name': "Action 1"},
-                                    {'id': 2, 'name': 'Action 2'}
+                                conn.sendall(json.dumps(result).encode() + b"\r\n")
+                            elif parsed["cmd"] == "listactions":
+                                result["data"] = [
+                                    {"id": 1, "name": "Action 1", "value1": 0},
+                                    {"id": 2, "name": "Action 2", "value1": 0},
                                 ]
-                                conn.sendall(json.dumps(result).encode()
-                                             + b"\r\n")
-                            elif parsed['cmd'] == 'executeactions':
-                                result['data'] = {"error": 0}
-                                conn.sendall(json.dumps(result).encode()
-                                             + b"\r\n")
+                                conn.sendall(json.dumps(result).encode() + b"\r\n")
+                            elif parsed["cmd"] == "executeactions":
+                                result["data"] = {"error": 0}
+                                conn.sendall(json.dumps(result).encode() + b"\r\n")
                             else:
-                                conn.sendall(data.encode()+b"\r\n")
+                                conn.sendall(data.encode() + b"\r\n")
                     except ConnectionResetError:
                         break
                     except json.JSONDecodeError:
                         if data:
-                            conn.sendall(data.encode()+b"\r\n")
+                            conn.sendall(data.encode() + b"\r\n")
                         pass
         except ConnectionAbortedError as e:
             print("Closing conn")
             if not self._stop:
-                raise(e)
+                raise (e)
         return
 
     def start(self):
@@ -100,7 +96,7 @@ def controller():
 
 def test_controller(controller):
     sock = socket()
-    sock.connect(('127.0.0.1', controller.port))
+    sock.connect(("127.0.0.1", controller.port))
     sock.sendall(b"Hello")
     data = sock.recv(1024)
     assert data == b"Hello\r\n"
@@ -112,7 +108,7 @@ def test_controller(controller):
 
 @pytest.fixture
 async def niko(controller):
-    niko = Niko('127.0.0.1', controller.port)
+    niko = Niko("127.0.0.1", controller.port)
     await niko.connect()
     yield niko
     await niko.close()
@@ -128,14 +124,14 @@ async def test_connection(controller, niko):
 async def test_get_locations(controller, niko):
     locations = await niko.get_locations()
     assert len(locations) > 0
-    assert locations[0]['id'] == 1
-    assert locations[0]['name'] == 'location1'
+    assert locations[0]["id"] == 1
+    assert locations[0]["name"] == "location1"
     assert '{"cmd": "listlocations"}' in controller.calls
     assert len(controller.calls) == 1
     # check if caching works
     assert len(locations) > 0
-    assert locations[0]['id'] == 1
-    assert locations[0]['name'] == 'location1'
+    assert locations[0]["id"] == 1
+    assert locations[0]["name"] == "location1"
     assert '{"cmd": "listlocations"}' in controller.calls
     assert len(controller.calls) == 1
     pass
@@ -146,13 +142,13 @@ async def test_get_actions(controller, niko):
     actions = await niko.get_actions()
     assert len(actions) > 0
     assert actions[0].device_id == 1
-    assert actions[0].name == 'Action 1'
+    assert actions[0].name == "Action 1"
     assert len(controller.calls) == 1
     # check if caching works
     actions = await niko.get_actions()
     assert len(actions) > 0
     assert actions[0].device_id == 1
-    assert actions[0].name == 'Action 1'
+    assert actions[0].name == "Action 1"
     assert len(controller.calls) == 1
     pass
 
