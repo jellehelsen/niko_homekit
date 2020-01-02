@@ -9,6 +9,8 @@ from socket import (
     inet_ntoa,
 )
 
+from .niko import Niko
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,4 +26,4 @@ def find_niko():
     LOGGER.debug("Discover data %x", data)
     ip_address = inet_ntoa(data[6:10])
     sock.close()
-    return ip_address
+    return Niko(ip_address)

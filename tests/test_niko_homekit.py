@@ -39,11 +39,12 @@ def test_command_line_interface():
     assert "--help  Show this message and exit." in help_result.output
 
 
-@patch("niko_homekit.niko_homekit.socket", spec=socket)
-def test_find_niko(sock):
+@pytest.mark.asyncio
+async def test_find_niko(mocker):
     """Test if Niko is found"""
+    sock = mocker.patch("niko_homekit.niko_homekit.socket", spec=socket)
     instance = sock.return_value
     return_data = b"D\0\0FFF" + inet_aton("192.168.0.120") + inet_aton("255.255.255.0")
     instance.recvfrom.return_value = (return_data, b"192.168.0.120")
     result = niko_homekit.find_niko()
-    assert result == "192.168.0.120"
+    assert result.address == "192.168.0.120"

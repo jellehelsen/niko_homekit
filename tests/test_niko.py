@@ -2,9 +2,10 @@
 
 import pytest
 import json
+import threading
 from socket import socket
 from threading import Thread
-from niko_homekit.niko.niko import Niko
+from niko_homekit.niko import Niko
 
 
 class MockNikoController(object):
