@@ -10,11 +10,7 @@ with open("README.rst") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = [
-    "Click>=7.0",
-    "ujson",
-    "aiocache",
-]
+requirements = ["Click>=7.0", "ujson", "aiocache", "HAP-python>=2.6.0"]
 
 setup_requirements = [
     "pytest-runner",

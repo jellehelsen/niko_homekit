@@ -24,6 +24,7 @@ class Action:
         self.device_id = device["id"]
         self.name = device["name"]
         self.value = device["value1"]
+        self.device_type = device["type"]
         self.controller = controller
 
     def set_value(self, value):
@@ -51,27 +52,27 @@ class NHCProtocol(asyncio.Protocol):
         self.connected.set_result(True)
 
     def data_received(self, data):
-        LOGGER.debug("data_received %x", data)
+        LOGGER.debug("data_received %r", data)
         decoded = data.decode()
-        LOGGER.debug("decoded %x", decoded)
+        LOGGER.debug("decoded %r", decoded)
         for line in decoded.splitlines(keepends=True):
-            LOGGER.debug("line %x", line)
+            LOGGER.debug("line %r", line)
             LOGGER.debug(self._buffer)
-            LOGGER.debug("buffer %x", self._buffer)
+            LOGGER.debug("buffer %r", self._buffer)
             self._buffer += line
-            LOGGER.debug("buffer %x", self._buffer)
+            LOGGER.debug("buffer %r", self._buffer)
             if self._buffer.endswith("\r\n"):
                 LOGGER.debug("buffer ended")
                 received = json.loads(self._buffer)
-                LOGGER.debug("received %x", received)
+                LOGGER.debug("received %r", received)
                 self._buffer = ""
                 if "cmd" in received:
-                    LOGGER.debug("Cmd Response %x", received)
+                    LOGGER.debug("Cmd Response %r", received)
                     self.cmd_done.set_result(received["data"])
 
     async def run_cmd(self, cmd):
         """Run the command"""
-        LOGGER.debug("run_cmd %x", cmd)
+        LOGGER.debug("run_cmd %r", cmd)
         await self.connected
         self.cmd_done = asyncio.get_event_loop().create_future()
         self.transport.writelines([json.dumps(cmd).encode()])
@@ -125,7 +126,7 @@ class Niko:
 
     async def do_cmd(self, cmd):
         """Do the command"""
-        LOGGER.debug("do_cmd %x", cmd)
+        LOGGER.debug("do_cmd %r", cmd)
         return await self.protocol.run_cmd(cmd)
 
     @cached()
@@ -142,12 +143,20 @@ class Niko:
         await actions
         return list(map(lambda action: Action(action, self), actions.result()))
 
-    async def execute_action(self, action_id=None, value=None):
+    async def execute_action(self, action_id, value):
         """Execute the action on NHC"""
+        LOGGER.debug("execute_action %d, %d", action_id, value)
         assert id is not None
         assert value is not None
+        LOGGER.debug("execute_action %d, %d", action_id, value)
         result = await self.do_cmd(
             {"cmd": "executeactions", "id": action_id, "value1": value}
         )
         await result
         return result.result()
+
+    def set_action_value(self, action_id, value):
+        """Set the value of an action"""
+        LOGGER.debug("setting value of action %d to %d", action_id, value)
+        coro = self.execute_action(action_id, value)
+        asyncio.run_coroutine_threadsafe(coro, self.loop)
