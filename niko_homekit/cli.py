@@ -8,7 +8,7 @@ import click
 
 from niko_homekit import niko_homekit
 
-logging.config.fileConfig("logging.conf", os.environ, disable_existing_loggers=False)
+# logging.config.fileConfig("logging.conf", os.environ, disable_existing_loggers=False)
 LOGGER = logging.getLogger(__name__)
 
 

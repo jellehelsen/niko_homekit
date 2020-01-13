@@ -8,7 +8,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from aiocache import cached
 
-logging.config.fileConfig("logging.conf", os.environ)
+# logging.config.fileConfig("logging.conf", os.environ)
 LOGGER = logging.getLogger(__name__)
 
 

@@ -26,7 +26,8 @@ Connects Niko Home Control v1 with Apple HomeKit.
 Features
 --------
 
-* TODO
+* Automatically detects your Niko Home Control Installation
+* QRCode authentication
 
 Credits
 -------
