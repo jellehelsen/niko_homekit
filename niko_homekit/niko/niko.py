@@ -1,6 +1,5 @@
 """Module for interacting with Niko Home Control"""
 import sys
-import os
 import asyncio
 import logging
 import logging.config

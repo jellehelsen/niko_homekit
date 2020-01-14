@@ -1,5 +1,4 @@
 """Console script for niko_homekit."""
-import os
 import asyncio
 import logging
 import logging.config
