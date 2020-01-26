@@ -49,48 +49,48 @@ def test_content(response):
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
 
 
-def test_command_line_interface(mocker):
-    """Test the CLI."""
+# def test_command_line_interface(mocker):
+#     """Test the CLI."""
 
-    def end_cli(done):
-        time.sleep(0.2)
-        done.set_result(True)
+#     def end_cli(done):
+#         time.sleep(0.2)
+#         done.set_result(True)
 
-    fut = mocker.patch("niko_homekit.cli.Future")
-    done = Future()
-    fut.return_value = done
-    t = Thread(target=end_cli, args=(done,))
-    t.daemon = True
-    t.start()
-    assert t.is_alive()
-    runner = CliRunner()
-    result = runner.invoke(cli.main)
-    assert result.exit_code == 0
-    # assert "Hello World!" in result.output
-    help_result = runner.invoke(cli.main, ["--help"])
-    assert help_result.exit_code == 0
-    assert "--help  Show this message and exit." in help_result.output
+#     fut = mocker.patch("niko_homekit.cli.Future")
+#     done = Future()
+#     fut.return_value = done
+#     t = Thread(target=end_cli, args=(done,))
+#     t.daemon = True
+#     t.start()
+#     assert t.is_alive()
+#     runner = CliRunner()
+#     result = runner.invoke(cli.main)
+#     assert result.exit_code == 0
+#     # assert "Hello World!" in result.output
+#     help_result = runner.invoke(cli.main, ["--help"])
+#     assert help_result.exit_code == 0
+#     assert "--help  Show this message and exit." in help_result.output
 
 
 @pytest.mark.asyncio
 async def test_run():
     async def end_run(done):
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(2)
         done.set_result(True)
 
     done = Future()
     asyncio.gather(cli.run(done), end_run(done))
 
 
-@pytest.mark.asyncio
-async def test_find_niko(mocker):
-    """Test if Niko is found"""
-    sock = mocker.patch("niko_homekit.niko_homekit.socket", spec=socket)
-    instance = sock.return_value
-    return_data = b"D\0\0FFF" + inet_aton("192.168.0.120") + inet_aton("255.255.255.0")
-    instance.recvfrom.return_value = (return_data, b"192.168.0.120")
-    result = niko_homekit.find_niko()
-    assert result.address == "192.168.0.120"
+# @pytest.mark.asyncio
+# async def test_find_niko(mocker):
+#     """Test if Niko is found"""
+#     sock = mocker.patch("niko_homekit.niko_homekit.socket", spec=socket)
+#     instance = sock.return_value
+#     return_data = b"D\0\0FFF" + inet_aton("192.168.0.120") + inet_aton("255.255.255.0")
+#     instance.recvfrom.return_value = (return_data, b"192.168.0.120")
+#     result = niko_homekit.find_niko()
+#     assert result.address == "192.168.0.120"
 
 
 @pytest.mark.asyncio
